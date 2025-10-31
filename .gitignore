@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,intellij,java,maven,netbeans,dotenv
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,intellij,java,maven,netbeans,dotenv
 
+### Profiles ###
+application-*.yml
+!application-test.yml
 ### dotenv ###
 .env
 
