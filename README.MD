@@ -46,3 +46,10 @@ Driver JDBC para conexão com banco de dados PostgreSQL.
 
 Redução de código boilerplate com anotações para getters, setters, construtores, etc.
 
+### Spring Boot Validation
+
+Validação de dados de entrada usando anotações.
+
+### Auth0 JWT
+
+Biblioteca para criação e verificação de tokens JWT para autenticação segura.
