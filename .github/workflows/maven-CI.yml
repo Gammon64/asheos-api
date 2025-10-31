@@ -17,7 +17,7 @@ on:
 jobs:
   build:
 
-    environment: Stage
+    environment: local
 
     runs-on: ubuntu-latest
 
