@@ -17,7 +17,14 @@ on:
 jobs:
   build:
 
-    environment: local
+    environment: ci  # 👈 aqui é o nome do environment criado
+
+    env:
+      ENV: ${{ vars.ENV }}
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
 
     runs-on: ubuntu-latest
 
