@@ -33,8 +33,8 @@ jobs:
         echo "DB_URL is $DB_URL"
         mvn -B package --file pom.xml
       env:
-        ENV: ci
-        DB_URL: jdbc:h2:mem:testdb
-        DB_USERNAME: sa
-        DB_PASSWORD: test
-        DB_DRIVER: org.h2.Driver
+        ENV: ${{secrets.ENV}}
+        DB_URL: ${{secrets.DB_URL}}
+        DB_USERNAME: ${{secrets.DB_USER}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+        DB_DRIVER: ${{secrets.DB_DRIVER}}
