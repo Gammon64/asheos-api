@@ -34,4 +34,4 @@ jobs:
     - name: Print env
       run: echo "ENV ${{ vars.ENV }}"
     - name: Print DB URL
-      run: echo "DB_URL ${{ secrets.DB_URL }}"
+      run: echo "DB_URL ${{ vars.DB_URL }}"
