@@ -27,12 +27,14 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Test if environment variable are set
+    - name: Test if environment variable is set
       run: echo "ENV is $ENV"
+    - name: Test if secret variable is set
+      run: echo "DB_URL is $DB_URL"
       env:
         ENV: ${{ vars.ENV }}
-        SPRING_DATASOURCE_URL: ${{ vars.DB_URL }}
-        SPRING_DATASOURCE__USERNAME: ${{ vars.DB_USER }}
-        SPRING_DATASOURCE__PASSWORD: ${{ vars.DB_PASSWORD }}
+        DB_URL: ${{ secrets.DB_URL }}
+        DB_USERNAME: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
