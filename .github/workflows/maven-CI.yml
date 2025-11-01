@@ -27,14 +27,13 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Test if environment variable is set
-      run: echo "ENV is $ENV"
-    - name: Test if secret variable is set
-      run: echo "DB_URL is $DB_URL"
+    - name: Build with Maven
+      run: | 
+        echo "ENV is $ENV"
+        echo "DB_URL is $DB_URL"
+        mvn -B package --file pom.xml
       env:
         ENV: ci
         DB_URL: jdbc:h2:mem:testdb
         DB_USERNAME: sa
         DB_PASSWORD: test
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
