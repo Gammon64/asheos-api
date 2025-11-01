@@ -31,8 +31,8 @@ jobs:
         cache: maven
       env:
         ENV: ${{ vars.ENV }}
-        DB_URL: ${{ vars.DB_URL }}
-        DB_USERNAME: ${{ vars.DB_USER }}
-        DB_PASSWORD: ${{ vars.DB_PASSWORD }}
+        SPRING_DATASOURCE_URL: ${{ vars.DB_URL }}
+        SPRING_DATASOURCE__USERNAME: ${{ vars.DB_USER }}
+        SPRING_DATASOURCE__PASSWORD: ${{ vars.DB_PASSWORD }}
     - name: Build with Maven
       run: mvn -B package --file pom.xml
