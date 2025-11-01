@@ -19,13 +19,6 @@ jobs:
 
     environment: ci  # 👈 aqui é o nome do environment criado
 
-    env:
-      ENV: ${{ vars.ENV }}
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-
     runs-on: ubuntu-latest
 
     steps:
@@ -37,4 +30,10 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
+    
       run: mvn -B package --file pom.xml
+      env:
+        ENV: ${{ vars.ENV }}
+        DB_URL: ${{ secrets.DB_URL }}
+        DB_USERNAME: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
