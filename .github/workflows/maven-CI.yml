@@ -29,11 +29,5 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    # - name: Build with Maven
-    #   run: mvn -B package --file pom.xml
-    - name: Print env
-      run: echo "ENV ${{ vars.ENV }}"
-    - name: Print DB URL
-      run: echo "DB_URL ${{ vars.DB_URL }}"
-    - name: Print DB_USER
-      run: echo "DB_USER ${{ secrets.DB_USER }}"
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
