@@ -37,3 +37,4 @@ jobs:
         DB_URL: jdbc:h2:mem:testdb
         DB_USERNAME: sa
         DB_PASSWORD: test
+        DB_DRIVER: org.h2.Driver
