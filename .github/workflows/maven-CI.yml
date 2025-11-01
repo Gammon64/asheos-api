@@ -32,9 +32,9 @@ jobs:
     - name: Test if secret variable is set
       run: echo "DB_URL is $DB_URL"
       env:
-        ENV: ${{ vars.ENV }}
-        DB_URL: ${{ secrets.DB_URL }}
-        DB_USERNAME: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ENV: ci
+        DB_URL: jdbc:h2:mem:testdb
+        DB_USERNAME: sa
+        DB_PASSWORD: test
     - name: Build with Maven
       run: mvn -B package --file pom.xml
