@@ -17,8 +17,6 @@ on:
 jobs:
   build:
 
-    environment: ci
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +27,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Test if environment variable are set
+      run: echo "ENV is $ENV"
       env:
         ENV: ${{ vars.ENV }}
         SPRING_DATASOURCE_URL: ${{ vars.DB_URL }}
