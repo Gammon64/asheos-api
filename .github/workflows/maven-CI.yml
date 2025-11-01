@@ -18,6 +18,7 @@ jobs:
   build:
 
     environment: ci
+    environment: ci
 
     runs-on: ubuntu-latest
 
