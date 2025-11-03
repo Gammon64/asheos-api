@@ -16,10 +16,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 @Service
 public class TokenService {
 
-    @Value("${jwt.secret-key}")
+    @Value("${JWT_SECRET_KEY}")
     private String secretKey;
 
-    @Value("${jwt.expiration-ms}")
+    @Value("${JWT_EXPIRATION_MS}")
     private long expirationMs;
 
     private final String ISSUER = "asheos-api"; // Emissor do token
