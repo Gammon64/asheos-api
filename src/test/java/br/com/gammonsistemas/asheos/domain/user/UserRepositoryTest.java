@@ -17,25 +17,19 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User user;
-
     // Set up constants for the tests
     @BeforeEach
     void setUp() {
-        user = new User();
-        user.setName("John Doe");
-        user.setEmail("johndoe@test.com");
-        user.setPassword("strongPassword123");
-        userRepository.save(user);
+        userRepository.save(UserMock.USER_JOHN_DOE());
     }
 
     @Test // Try to find user by email
     void testFindByEmail() {
         // When
-        Optional<User> foundUser = userRepository.findByEmail("johndoe@test.com");
+        Optional<User> foundUser = userRepository.findByEmail(UserMock.USER_EMAIL);
         // Then
         assertTrue(foundUser.isPresent());
-        assertTrue(foundUser.get().getEmail().equals("johndoe@test.com"));
+        assertTrue(foundUser.get().getEmail().equals(UserMock.USER_EMAIL));
     }
 
     @Test // Try to find user by email that does not exist
