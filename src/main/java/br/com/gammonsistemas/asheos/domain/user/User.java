@@ -1,6 +1,10 @@
 package br.com.gammonsistemas.asheos.domain.user;
 
+import java.util.Collection;
 import java.util.UUID;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +17,7 @@ import lombok.Data;
 @Entity
 @Table(name = "users")
 @Data
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,4 +31,14 @@ public class User {
 
     @Column(nullable = false, name = "password_hash")
     private String password;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
 }
