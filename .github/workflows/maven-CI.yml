@@ -38,3 +38,6 @@ jobs:
         DB_USERNAME: ${{secrets.DB_USER}}
         DB_PASSWORD: ${{secrets.DB_PASSWORD}}
         DB_DRIVER: ${{secrets.DB_DRIVER}}
+        JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+        JWT_EXPIRATION_MS: ${{secrets.JWT_EXPIRATION_MS}}
+
