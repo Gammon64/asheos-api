@@ -32,13 +32,14 @@ public class SecurityConfig {
                 // Define regras de autorização para requisições
                 .authorizeHttpRequests(auth -> auth
                         // Libera rotas de autenticação
-                        .requestMatchers(HttpMethod.POST, "/user/auth", "user/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register", "auth/login").permitAll()
                         // Obriga autenticação para outras rotas
                         .anyRequest().authenticated())
                 // Define o provedor de autenticação
                 .authenticationProvider(authenticationProvider)
                 // Adiciona o filtro JWT antes do filtro de autenticação padrão
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .anonymous(AbstractHttpConfigurer::disable)
                 .build();
     }
 }
