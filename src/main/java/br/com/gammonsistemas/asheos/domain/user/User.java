@@ -1,7 +1,6 @@
 package br.com.gammonsistemas.asheos.domain.user;
 
 import java.util.Collection;
-import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,8 +23,8 @@ import lombok.RequiredArgsConstructor;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private String name;
