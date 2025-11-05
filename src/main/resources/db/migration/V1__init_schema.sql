@@ -1,6 +1,6 @@
 -- Tabela de Usuários/Clientes
 CREATE TABLE users (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
@@ -9,8 +9,8 @@ CREATE TABLE users (
 
 -- Tabela de Endereços
 CREATE TABLE addresses (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     street VARCHAR(255) NOT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(50) NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE addresses (
 
 -- Tabela de Ocorrências
 CREATE TABLE occurrences (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES users(id),
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGSERIAL NOT NULL REFERENCES users(id),
     title VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(50) NOT NULL DEFAULT 'OPEN',
@@ -30,8 +30,8 @@ CREATE TABLE occurrences (
 
 -- Tabela de Anexos
 CREATE TABLE attachments (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
-    occurrence_id UUID NOT NULL REFERENCES occurrences(id) ON DELETE CASCADE,
+    id BIGSERIAL PRIMARY KEY,
+    occurrence_id BIGSERIAL NOT NULL REFERENCES occurrences(id) ON DELETE CASCADE,
     file_name VARCHAR(255) NOT NULL,
     file_path VARCHAR(512) NOT NULL,
     -- O 'caminho' ou 'key' no Min.io 
