@@ -21,7 +21,7 @@ public class UserRepositoryTest {
     // Set up constants for the tests
     @BeforeEach
     void setUp() {
-        User user = new User(null, UserMock.USER_NAME, UserMock.USER_EMAIL, UserMock.USER_PASSWORD);
+        User user = UserMock.USER_JOHN_DOE();
         userRepository.save(user);
     }
 

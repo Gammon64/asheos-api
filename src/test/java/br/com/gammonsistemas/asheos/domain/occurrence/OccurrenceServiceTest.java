@@ -63,12 +63,9 @@ public class OccurrenceServiceTest {
     @DisplayName("Deve falhar ao atualizar o status de uma ocorrência fechada")
     void testUpdateStatusClosedOccurrence() {
         // Given
-        Occurrence closedOccurrence = new Occurrence(
-                1L,
-                OccurrenceMock.OCCURENCE_TITLE,
-                OccurrenceMock.OCCURRENCE_DESCRIPTION,
-                OccurrenceStatus.CLOSED,
-                null);
+        Occurrence closedOccurrence = OccurrenceMock.OCCURRENCE_LAMPPOST();
+        closedOccurrence.setId(1L);
+        closedOccurrence.setStatus(OccurrenceStatus.CLOSED);
 
         when(occurrenceRepository.findById(1L)).thenReturn(Optional.of(closedOccurrence));
         // When & Then

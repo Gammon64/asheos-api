@@ -1,5 +1,7 @@
 package br.com.gammonsistemas.asheos.domain.occurrence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Attachment {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +35,7 @@ public class Attachment {
     @Column(nullable = false)
     private String mimeType;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "occurrence_id", nullable = false)
     private Occurrence occurrence;

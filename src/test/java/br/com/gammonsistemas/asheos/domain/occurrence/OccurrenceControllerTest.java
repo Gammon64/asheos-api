@@ -46,10 +46,9 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                 userRepository.deleteAll();
 
                 // Cria o usuário no banco
-                mockLoggedUser = new User(null,
-                                UserMock.USER_NAME,
-                                UserMock.USER_EMAIL,
-                                passwordEncoder.encode(UserMock.USER_PASSWORD));
+                mockLoggedUser = UserMock.USER_JOHN_DOE();
+                mockLoggedUser.setPassword(passwordEncoder.encode(UserMock.USER_PASSWORD));
+
                 userRepository.save(mockLoggedUser);
         }
 
@@ -95,7 +94,9 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                                                 fieldWithPath("reportedBy.name")
                                                                                 .description("Nome do usuário."),
                                                                 fieldWithPath("reportedBy.email")
-                                                                                .description("Email do usuário."))));
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
         }
 
         @Test
