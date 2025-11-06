@@ -30,8 +30,8 @@ public class OccurrenceService {
         .orElseThrow(() ->new EntityNotFoundException("A Ocorrência não existe"));
     }
 
-    public Occurrence create (OccurrenceRequest request) {
-        User reporter = userService.findById(request.reportedBy());
+    public Occurrence create (OccurrenceRequest request, Long userId) {
+        User reporter = userService.findById(userId);
 
         Occurrence occurrence = new Occurrence(
             null,

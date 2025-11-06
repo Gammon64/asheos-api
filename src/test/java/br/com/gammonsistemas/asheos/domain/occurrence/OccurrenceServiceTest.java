@@ -41,14 +41,14 @@ public class OccurrenceServiceTest {
         // Given
         User mockUser = UserMock.USER_JOHN_DOE();
         mockUser.setId(1L);
-        OccurrenceRequest request = new OccurrenceRequest(OccurrenceMock.OCCURENCE_TITLE, "Descrição...",
-                mockUser.getId());
+        OccurrenceRequest request = new OccurrenceRequest(OccurrenceMock.OCCURENCE_TITLE,
+                OccurrenceMock.OCCURRENCE_DESCRIPTION);
 
         when(userService.findById(1L)).thenReturn(mockUser);
         // Quando o save for chamado, retorne a entidade que foi passada para ele
         when(occurrenceRepository.save(any(Occurrence.class))).thenAnswer(invocation -> invocation.getArgument(0));
         // When
-        Occurrence result = occurrenceService.create(request);
+        Occurrence result = occurrenceService.create(request, mockUser.getId());
         // Then
         assertNotNull(result);
         assertEquals(result.getTitle(), OccurrenceMock.OCCURENCE_TITLE);
