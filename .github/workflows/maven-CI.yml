@@ -34,10 +34,16 @@ jobs:
         mvn -B package --file pom.xml
       env:
         ENV: ${{secrets.ENV}}
+        # DB
         DB_URL: ${{secrets.DB_URL}}
-        DB_USERNAME: ${{secrets.DB_USER}}
+        DB_USERNAME: ${{secrets.DB_USERNAME}}
         DB_PASSWORD: ${{secrets.DB_PASSWORD}}
         DB_DRIVER: ${{secrets.DB_DRIVER}}
+        # JWT
         JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
         JWT_EXPIRATION_MS: ${{secrets.JWT_EXPIRATION_MS}}
-
+        # AWS
+        AWS_URL: ${{secrets.AWS_URL}}
+        AWS_ACCESS_KEY: ${{secrets.AWS_ACCESS_KEY}}
+        AWS_SECRET_KEY: ${{secrets.AWS_SECRET_KEY}}
+        AWS_BUCKET_NAME: ${{secrets.AWS_BUCKET_NAME}}

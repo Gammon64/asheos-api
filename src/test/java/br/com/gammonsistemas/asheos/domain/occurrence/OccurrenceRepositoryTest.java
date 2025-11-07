@@ -35,11 +35,9 @@ public class OccurrenceRepositoryTest {
     void setUp() {
         user = UserMock.USER_JOHN_DOE();
         entityManager.persist(user);
-        occurrence = new Occurrence(
-                null,
-                OccurrenceMock.OCCURENCE_TITLE,
-                OccurrenceMock.OCCURRENCE_DESCRIPTION,
-                OccurrenceStatus.OPENED, user);
+        occurrence = OccurrenceMock.OCCURRENCE_LAMPPOST();
+        occurrence.setReportedBy(user);
+
         occurrenceRepository.save(occurrence);
     }
 
@@ -63,7 +61,8 @@ public class OccurrenceRepositoryTest {
                 null,
                 "New User",
                 "newuser@test.com",
-                "12345678");
+                "12345678",
+                null);
         entityManager.persist(newUser);
         // When
         List<Occurrence> foundOccurrences = occurrenceRepository.findByReportedBy_id(newUser.getId());

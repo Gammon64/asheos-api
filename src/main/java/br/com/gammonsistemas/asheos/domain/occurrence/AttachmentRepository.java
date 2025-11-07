@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OccurrenceRepository extends JpaRepository<Occurrence, Long> {
+public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
+
+    List<Attachment> findAllByOccurrence_Id(Long occurrenceId);
     
-    List<Occurrence> findByReportedBy_id(Long id);
-    List<Occurrence> findByStatus(OccurrenceStatus status);
 }

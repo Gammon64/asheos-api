@@ -39,7 +39,8 @@ public class AuthService {
                 null,
                 request.name(),
                 request.email(),
-                passwordEncoder.encode(request.password()));
+                passwordEncoder.encode(request.password()),
+                null);
 
         user = userRepository.save(user);
 

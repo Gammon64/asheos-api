@@ -1,9 +1,15 @@
 package br.com.gammonsistemas.asheos.domain.occurrence;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -13,12 +19,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.gammonsistemas.asheos.AbstractRestDocsTest;
+import br.com.gammonsistemas.asheos.core.storage.StorageService;
 import br.com.gammonsistemas.asheos.domain.occurrence.dto.OccurrenceRequest;
 import br.com.gammonsistemas.asheos.domain.user.User;
 import br.com.gammonsistemas.asheos.domain.user.UserMock;
@@ -36,9 +46,16 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
         private UserRepository userRepository;
 
         @Autowired
+        private AttachmentRepository attachmentRepository;
+
+        @Autowired
         private PasswordEncoder passwordEncoder;
 
+        @MockitoBean
+        private StorageService storageService;
+
         private User mockLoggedUser;
+        private Occurrence mockOccurrence;
 
         @BeforeEach
         void setUp() {
@@ -46,11 +63,15 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                 userRepository.deleteAll();
 
                 // Cria o usuário no banco
-                mockLoggedUser = new User(null,
-                                UserMock.USER_NAME,
-                                UserMock.USER_EMAIL,
-                                passwordEncoder.encode(UserMock.USER_PASSWORD));
+                mockLoggedUser = UserMock.USER_JOHN_DOE();
+                mockLoggedUser.setPassword(passwordEncoder.encode(UserMock.USER_PASSWORD));
+
                 userRepository.save(mockLoggedUser);
+
+                mockOccurrence = OccurrenceMock.OCCURRENCE_LAMPPOST();
+                mockOccurrence.setReportedBy(mockLoggedUser);
+
+                occurrenceRepository.save(mockOccurrence);
         }
 
         @Test
@@ -95,7 +116,9 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                                                 fieldWithPath("reportedBy.name")
                                                                                 .description("Nome do usuário."),
                                                                 fieldWithPath("reportedBy.email")
-                                                                                .description("Email do usuário."))));
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
         }
 
         @Test
@@ -111,5 +134,72 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve fazer o upload de um anexo")
+        void testUploadAttachment() throws Exception {
+                // Given
+                MockMultipartFile file = new MockMultipartFile(
+                                "file",
+                                "test-upload.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "fake-image-bytes".getBytes());
+
+                when(storageService.uploadFile(any(MultipartFile.class), anyString()))
+                                .thenReturn("path/to/mock-file.jpg");
+                // When & Then
+                mockMvc.perform(
+                                multipart("/occurrences/{id}/attachments", mockOccurrence.getId())
+                                                .file(file))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.fileName").value("test-upload.jpg"))
+                                .andExpect(jsonPath("$.filePath").isString())
+                                .andDo(document("occurrences/attachments/upload"));
+        }
+
+        @Test
+        @WithMockUser(username = "stranger@test.com")
+        @DisplayName("Deve falhar ao fazer o upload de um anexo quando usuário não é responsável")
+        void testUploadAttachmentUnauthorized() throws Exception {
+                // Given
+                User stranger = new User();
+                stranger.setEmail("stranger@test.com");
+                stranger.setName("Stranger");
+                stranger.setPassword("123");
+                userRepository.save(stranger);
+
+                MockMultipartFile file = new MockMultipartFile("file", "test.jpg", MediaType.IMAGE_JPEG_VALUE,
+                                "bytes".getBytes());
+                // When & Then
+                mockMvc.perform(
+                                multipart("/occurrences/{id}/attachments", mockOccurrence.getId())
+                                                .file(file))
+                                // O serviço lança AccessDeniedException, o Spring trata como 403
+                                .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve excluir um anexo")
+        void testDeleteAttachment() throws Exception {
+                // Given
+                Attachment attachment = new Attachment();
+                attachment.setOccurrence(mockOccurrence);
+                attachment.setFileName("delete-me.txt");
+                attachment.setFilePath("path/to/delete-me.txt");
+                attachment.setMimeType("text/plain");
+                attachmentRepository.save(attachment);
+
+                doNothing().when(storageService).deleteFile("path/to/delete-me.txt");
+
+                // When
+                mockMvc.perform(
+                                delete("/occurrences/{id}/attachments/{attachmentId}",
+                                                mockOccurrence.getId(), attachment.getId()))
+                                .andExpect(status().isNoContent()) // Espera 204
+                                .andDo(document("occurrences/attachments/delete"));
+                // Then
         }
 }

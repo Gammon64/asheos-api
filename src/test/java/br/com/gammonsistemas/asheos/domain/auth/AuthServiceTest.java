@@ -44,7 +44,7 @@ public class AuthServiceTest {
         RegisterRequest request = new RegisterRequest(UserMock.USER_NAME, UserMock.USER_EMAIL,
                 UserMock.USER_PASSWORD);
 
-        User usuarioSalvo = new User(null, UserMock.USER_NAME, UserMock.USER_EMAIL, UserMock.USER_PASSWORD);
+        User usuarioSalvo = UserMock.USER_JOHN_DOE();
         String mockJwtToken = "mock.jwt.token";
 
         when(passwordEncoder.encode(UserMock.USER_PASSWORD)).thenReturn("HashedPAssword");
