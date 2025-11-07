@@ -27,3 +27,14 @@ logging:
         root: INFO
         org.springframework: INFO
         br.com.gammonsistemas: DEBUG
+
+# Value injection
+jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    expiration-ms: ${JWT_EXPIRATION_MS}
+
+aws:
+    url: ${AWS_URL}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+    bucket-name: ${AWS_BUCKET_NAME}
