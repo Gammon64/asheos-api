@@ -35,13 +35,7 @@ public class AuthService {
             throw new IllegalArgumentException("O email já está em uso");
         }
 
-        User user = new User(
-                null,
-                request.name(),
-                request.email(),
-                passwordEncoder.encode(request.password()),
-                null);
-
+        User user = new User(request.name(), request.email(), passwordEncoder.encode(request.password()));
         user = userRepository.save(user);
 
         // Gera o token JWT
