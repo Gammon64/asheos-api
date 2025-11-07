@@ -138,7 +138,7 @@ public class OccurrenceController {
             @PathVariable Long attachmentId,
             Authentication authentication) {
         Long userId = handleLoggedUserId(authentication);
-        occurrenceService.deleteAttachment(id, attachmentId, userId);
+        occurrenceService.deleteAttachment(id, userId, attachmentId);
 
         return ResponseEntity.noContent().build();
     }
