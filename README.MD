@@ -63,7 +63,7 @@ A documentação completa dos endpoints, incluindo exemplos de requisições e r
     ./mvnw clean install
     ```
 2.  **Acesse o arquivo HTML**: Abra o seguinte arquivo no seu navegador para visualizar a documentação completa:
-    `file:///<caminho-absoluto-para-o-projeto>/asheos-api/target/docs/index.html`
+    `file:///<caminho-absoluto-para-o-projeto>/asheos-api/target/generated-docs/index.html`
 
 ### Acessando os Endpoints
 
