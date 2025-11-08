@@ -35,8 +35,9 @@ public class OccurrenceController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Occurrence>> getAllOccurrences() {
-        List<Occurrence> occurrences = occurrenceService.findAll();
+    public ResponseEntity<List<Occurrence>> getAllOccurrencesByReporter(Authentication authentication) {
+        Long userId = handleLoggedUserId(authentication);
+        List<Occurrence> occurrences = occurrenceService.findByReporter(userId);
 
         return ResponseEntity.ok(occurrences);
     }
@@ -63,11 +64,13 @@ public class OccurrenceController {
         return ResponseEntity.ok(occurrence);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOccurrence(@PathVariable Long id) {
         occurrenceService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Rotas de Anexos
 
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Attachment> uploadAttachment(
@@ -79,11 +82,6 @@ public class OccurrenceController {
         Attachment attachment = occurrenceService.addAttachment(id, file, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(attachment);
-    }
-
-    private Long handleLoggedUserId(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userService.findByEmail(userDetails.getUsername()).getId();
     }
 
     /**
@@ -109,7 +107,7 @@ public class OccurrenceController {
             Authentication authentication) {
         Long userId = handleLoggedUserId(authentication);
 
-        byte[] fileData = occurrenceService.downloadAttachment(id, attachmentId, userId);
+        byte[] fileData = occurrenceService.downloadAttachment(id, userId, attachmentId);
 
         Attachment attachment = occurrenceService.findAttachmentById(attachmentId);
         String contentType = attachment.getMimeType();
@@ -141,6 +139,11 @@ public class OccurrenceController {
         occurrenceService.deleteAttachment(id, userId, attachmentId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private Long handleLoggedUserId(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userService.findByEmail(userDetails.getUsername()).getId();
     }
 
 }

@@ -7,10 +7,18 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -122,7 +130,7 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao tentar acessar rota sem usuário autenticado")
+        @DisplayName("Deve falhar ao tentar criar uma ocorrência sem usuário autenticado")
         void testCreateOccurrenceWithoutAuthentication() throws Exception {
                 // Given
                 OccurrenceRequest request = new OccurrenceRequest(
@@ -135,6 +143,124 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isUnauthorized());
         }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve listar todas as ocorrências")
+        void testListOccurrences() throws Exception {
+                // When & Then
+                mockMvc.perform(get("/occurrences"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").exists())
+                                .andExpect(jsonPath("$[0].title").value(OccurrenceMock.OCCURENCE_TITLE))
+                                .andExpect(jsonPath("$[0].status").value("OPENED"))
+                                .andDo(document("occurrences/list",
+                                                responseFields(
+                                                                fieldWithPath("[]").description(
+                                                                                "Lista de ocorrências."),
+                                                                fieldWithPath("[].id").description(
+                                                                                "ID da ocorrência."),
+                                                                fieldWithPath("[].title").description(
+                                                                                "Título da ocorrência."),
+                                                                fieldWithPath("[].description").description(
+                                                                                "Descrição detalhada."),
+                                                                fieldWithPath("[].status").description(
+                                                                                "Status da ocorrência."),
+                                                                fieldWithPath("[].reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("[].reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("[].reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("[].reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("[].attachments")
+                                                                                .description("Anexos da ocorrência."))));
+
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve encontrar uma ocorrência por Id")
+        void testFindOccurrenceById() throws Exception {
+                // When & Then
+                mockMvc.perform(get("/occurrences/{id}", mockOccurrence.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").exists())
+                                .andExpect(jsonPath("$.title").value(OccurrenceMock.OCCURENCE_TITLE))
+                                .andExpect(jsonPath("$.status").value("OPENED"))
+                                .andDo(document("occurrences/get",
+                                                responseFields(
+                                                                fieldWithPath("id").description(
+                                                                                "ID da ocorrência criada."),
+                                                                fieldWithPath("title")
+                                                                                .description("Título da ocorrência."),
+                                                                fieldWithPath("description")
+                                                                                .description("Descrição detalhada."),
+                                                                fieldWithPath("status").description(
+                                                                                "Status inicial (ex: OPENED)."),
+                                                                fieldWithPath("reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve atualizar o status de uma ocorrência")
+        void testUpdateOccurrenceStatus() throws Exception {
+                // Given
+                String newStatus = OccurrenceStatus.IN_PROGRESS.toString();
+
+                // When & Then
+                mockMvc.perform(patch("/occurrences/{id}/status", mockOccurrence.getId())
+                                .queryParam("status", newStatus)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(mockOccurrence.getId()))
+                                .andExpect(jsonPath("$.status").value(newStatus))
+                                .andDo(document("occurrences/update-status",
+                                                queryParameters(parameterWithName("status").description(
+                                                                "Novo status da ocorrência.")),
+                                                responseFields(
+                                                                fieldWithPath("id").description(
+                                                                                "ID da ocorrência criada."),
+                                                                fieldWithPath("title")
+                                                                                .description("Título da ocorrência."),
+                                                                fieldWithPath("description")
+                                                                                .description("Descrição detalhada."),
+                                                                fieldWithPath("status").description(
+                                                                                "Status atualizado da ocorrência."),
+                                                                fieldWithPath("reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve excluir uma ocorrência")
+        void testDeleteOccurrence() throws Exception {
+                // When
+                mockMvc.perform(
+                                delete("/occurrences/{id}", mockOccurrence.getId()))
+                                .andExpect(status().isNoContent()) // Espera 204
+                                .andDo(document("occurrences/delete"));
+        }
+
+        // Anexos
 
         @Test
         @WithMockUser(username = "johndoe@test.com")
@@ -156,7 +282,18 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.fileName").value("test-upload.jpg"))
                                 .andExpect(jsonPath("$.filePath").isString())
-                                .andDo(document("occurrences/attachments/upload"));
+                                .andDo(document("occurrences/attachments/upload",
+                                                requestParts(
+                                                                partWithName("file")
+                                                                                .description("Arquivo a ser enviado.")),
+                                                responseFields(
+                                                                fieldWithPath("id").description("ID do anexo."),
+                                                                fieldWithPath("fileName")
+                                                                                .description("Nome do arquivo."),
+                                                                fieldWithPath("filePath")
+                                                                                .description("Caminho do arquivo."),
+                                                                fieldWithPath("mimeType")
+                                                                                .description("Tipo do arquivo."))));
         }
 
         @Test
@@ -178,6 +315,71 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                                 .file(file))
                                 // O serviço lança AccessDeniedException, o Spring trata como 403
                                 .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve listar anexos de uma ocorrência")
+        void testListAttachments() throws Exception {
+                // Given
+                Attachment attachment = new Attachment(
+                                null,
+                                "test-download.jpg",
+                                "path/to/test-download.jpg",
+                                "image/jpeg",
+                                mockOccurrence);
+
+                attachmentRepository.save(attachment);
+
+                // When & Then
+                mockMvc.perform(
+                                get("/occurrences/{id}/attachments", mockOccurrence.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].fileName").value("test-download.jpg"))
+                                .andExpect(jsonPath("$[0].filePath").isString())
+                                .andDo(document("occurrences/attachments/list",
+                                                responseFields(
+                                                                fieldWithPath("[]").description("Lista de anexos."),
+                                                                fieldWithPath("[].id").description("ID do anexo."),
+                                                                fieldWithPath("[].fileName")
+                                                                                .description("Nome do arquivo."),
+                                                                fieldWithPath("[].filePath")
+                                                                                .description("Caminho do arquivo."),
+                                                                fieldWithPath("[].mimeType")
+                                                                                .description("Tipo do arquivo."))));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve fazer o download de um anexo")
+        void testDownloadAttachment() throws Exception {
+                // Given
+                MockMultipartFile file = new MockMultipartFile(
+                                "file",
+                                "test-download.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "fake-image-bytes".getBytes());
+
+                Attachment attachment = new Attachment(
+                                null,
+                                "test-download.jpg",
+                                "path/to/test-download.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                mockOccurrence);
+
+                when(storageService.downloadFile(anyString()))
+                                .thenReturn(file.getBytes());
+
+                attachmentRepository.save(attachment);
+
+                // When & Then
+                mockMvc.perform(
+                                get("/occurrences/{id}/attachments/{attachmentId}/download", mockOccurrence.getId(),
+                                                attachment.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
+                                .andDo(document("occurrences/attachments/download",
+                                                responseBody()));
         }
 
         @Test

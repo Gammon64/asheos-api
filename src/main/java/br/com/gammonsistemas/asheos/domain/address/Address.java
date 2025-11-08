@@ -1,6 +1,6 @@
 package br.com.gammonsistemas.asheos.domain.address;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.gammonsistemas.asheos.domain.user.User;
 import jakarta.persistence.Column;
@@ -40,6 +40,6 @@ public class Address {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties("addresses")
+    @JsonIgnore
     private User user;
 }

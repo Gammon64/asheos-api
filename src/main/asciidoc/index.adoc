@@ -1,0 +1,129 @@
+= API Asheos - Documentação
+Autor: Hugo Henrique
+:doctype: book
+:icons: font
+:source-highlighter: highlight.js
+:toc: left
+:toclevels: 3
+:sectnums:
+:operation-http-request-title: Exemplo de Requisição
+:operation-request-fields-title: Campos da Requisição
+:operation-http-response-title: Exemplo de Resposta
+:operation-response-fields-title: Campos da Resposta
+
+[[geral]]
+== Visão Geral
+
+ESta API REST foi desenvolvida para a gestão de ocorrências urbanas. Todos os endpoints requerem autenticação via token JWT (Bearer).
+
+[[autenticacao]]
+== Autenticação
+
+Endpoints de login e registro.
+
+=== Login (POST /auth/login)
+include::{snippets}/auth/login/http-request.adoc[]
+include::{snippets}/auth/login/request-fields.adoc[]
+include::{snippets}/auth/login/http-response.adoc[]
+include::{snippets}/auth/login/response-fields.adoc[]
+
+=== Registro (POST /auth/register)
+include::{snippets}/auth/register/http-request.adoc[]
+include::{snippets}/auth/register/request-fields.adoc[]
+include::{snippets}/auth/register/http-response.adoc[]
+include::{snippets}/auth/register/response-fields.adoc[]
+
+
+[[users]]
+== Usuários
+
+Endpoints para gerenciar o perfil do usuário logado.
+
+=== Obter Perfil (GET /users/me)
+include::{snippets}/users/me/http-request.adoc[]
+include::{snippets}/users/me/http-response.adoc[]
+include::{snippets}/users/me/response-fields.adoc[]
+
+
+[[ocorrencias]]
+== Ocorrências
+
+Endpoints para gerenciar as ocorrências.
+
+=== Criar Ocorrência (POST /occurrences)
+include::{snippets}/occurrences/create/http-request.adoc[]
+include::{snippets}/occurrences/create/request-fields.adoc[]
+include::{snippets}/occurrences/create/http-response.adoc[]
+include::{snippets}/occurrences/create/response-fields.adoc[]
+
+=== Listar Ocorrências (GET /occurrences)
+include::{snippets}/occurrences/list/http-request.adoc[]
+include::{snippets}/occurrences/list/http-response.adoc[]
+include::{snippets}/occurrences/list/response-fields.adoc[]
+
+=== Buscar Ocorrência (GET /occurrences/{id})
+include::{snippets}/occurrences/get/http-request.adoc[]
+include::{snippets}/occurrences/get/http-response.adoc[]
+include::{snippets}/occurrences/get/response-fields.adoc[]
+
+=== Atualizar Status da corrência (PATCH /occurrences/{id})
+include::{snippets}/occurrences/update-status/http-request.adoc[]
+include::{snippets}/occurrences/update-status/query-parameters.adoc[]
+include::{snippets}/occurrences/update-status/http-response.adoc[]
+include::{snippets}/occurrences/update-status/response-fields.adoc[]
+
+=== Excluir Ocorrência (DELETE /occurrences/{id})
+include::{snippets}/occurrences/delete/http-request.adoc[]
+include::{snippets}/occurrences/delete/http-response.adoc[]
+
+[[attachments]]
+== Anexos
+
+Endpoints para gerenciar anexos de ocorrências.
+
+=== Upload de Anexo (POST /occurrences/{id}/attachments/upload)
+include::{snippets}/occurrences/attachments/upload/http-request.adoc[]
+include::{snippets}/occurrences/attachments/upload/request-parts.adoc[]
+include::{snippets}/occurrences/attachments/upload/http-response.adoc[]
+include::{snippets}/occurrences/attachments/upload/response-fields.adoc[]
+
+=== Download de Anexo (GET /occurrences/{id}/attachments/{id}/download)
+include::{snippets}/occurrences/attachments/download/http-request.adoc[]
+include::{snippets}/occurrences/attachments/download/http-response.adoc[]
+
+
+=== Listar Anexos (GET /occurrences/{id}/attachments)
+include::{snippets}/occurrences/attachments/list/http-request.adoc[]
+include::{snippets}/occurrences/attachments/list/http-response.adoc[]
+include::{snippets}/occurrences/attachments/list/response-fields.adoc[]
+
+=== Excluir Anexo (DELETE /occurrences/{id}/attachments/{id})
+include::{snippets}/occurrences/attachments/delete/http-request.adoc[]
+include::{snippets}/occurrences/attachments/delete/http-response.adoc[]
+
+
+[[addresses]]
+== Endereços
+
+Endpoints para gerenciar endereços.
+
+=== Criar Endereço (POST /addresses)
+include::{snippets}/addresses/create/http-request.adoc[]
+include::{snippets}/addresses/create/request-fields.adoc[]
+include::{snippets}/addresses/create/http-response.adoc[]
+include::{snippets}/addresses/create/response-fields.adoc[]
+
+=== Listar Endereços de Usuário autenticado (GET /addresses)
+include::{snippets}/addresses/list/http-request.adoc[]
+include::{snippets}/addresses/list/http-response.adoc[]
+include::{snippets}/addresses/list/response-fields.adoc[]
+
+=== Atualizar Endereço (PUT /addresses/{id})
+include::{snippets}/addresses/update/http-request.adoc[]
+include::{snippets}/addresses/update/request-fields.adoc[]
+include::{snippets}/addresses/update/http-response.adoc[]
+include::{snippets}/addresses/update/response-fields.adoc[]
+
+=== Excluir Endereço (DELETE /addresses/{id})
+include::{snippets}/addresses/delete/http-request.adoc[]
+include::{snippets}/addresses/delete/http-response.adoc[]
