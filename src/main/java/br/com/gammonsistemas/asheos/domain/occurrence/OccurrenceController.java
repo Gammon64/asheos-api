@@ -35,8 +35,9 @@ public class OccurrenceController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<Occurrence>> getAllOccurrences() {
-        List<Occurrence> occurrences = occurrenceService.findAll();
+    public ResponseEntity<List<Occurrence>> getAllOccurrencesByReporter(Authentication authentication) {
+        Long userId = handleLoggedUserId(authentication);
+        List<Occurrence> occurrences = occurrenceService.findByReporter(userId);
 
         return ResponseEntity.ok(occurrences);
     }
