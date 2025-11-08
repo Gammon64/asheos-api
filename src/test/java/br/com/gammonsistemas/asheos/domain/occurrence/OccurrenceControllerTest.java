@@ -7,7 +7,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -215,12 +220,14 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
 
                 // When & Then
                 mockMvc.perform(patch("/occurrences/{id}/status", mockOccurrence.getId())
-                                .param("status", newStatus)
+                                .queryParam("status", newStatus)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.id").value(mockOccurrence.getId()))
                                 .andExpect(jsonPath("$.status").value(newStatus))
                                 .andDo(document("occurrences/update-status",
+                                                queryParameters(parameterWithName("status").description(
+                                                                "Novo status da ocorrência.")),
                                                 responseFields(
                                                                 fieldWithPath("id").description(
                                                                                 "ID da ocorrência criada."),
@@ -275,7 +282,18 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.fileName").value("test-upload.jpg"))
                                 .andExpect(jsonPath("$.filePath").isString())
-                                .andDo(document("occurrences/attachments/upload"));
+                                .andDo(document("occurrences/attachments/upload",
+                                                requestParts(
+                                                                partWithName("file")
+                                                                                .description("Arquivo a ser enviado.")),
+                                                responseFields(
+                                                                fieldWithPath("id").description("ID do anexo."),
+                                                                fieldWithPath("fileName")
+                                                                                .description("Nome do arquivo."),
+                                                                fieldWithPath("filePath")
+                                                                                .description("Caminho do arquivo."),
+                                                                fieldWithPath("mimeType")
+                                                                                .description("Tipo do arquivo."))));
         }
 
         @Test
@@ -319,7 +337,16 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$[0].fileName").value("test-download.jpg"))
                                 .andExpect(jsonPath("$[0].filePath").isString())
-                                .andDo(document("occurrences/attachments/list"));
+                                .andDo(document("occurrences/attachments/list",
+                                                responseFields(
+                                                                fieldWithPath("[]").description("Lista de anexos."),
+                                                                fieldWithPath("[].id").description("ID do anexo."),
+                                                                fieldWithPath("[].fileName")
+                                                                                .description("Nome do arquivo."),
+                                                                fieldWithPath("[].filePath")
+                                                                                .description("Caminho do arquivo."),
+                                                                fieldWithPath("[].mimeType")
+                                                                                .description("Tipo do arquivo."))));
         }
 
         @Test
@@ -351,7 +378,8 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                                 attachment.getId()))
                                 .andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
-                                .andDo(document("occurrences/attachments/download"));
+                                .andDo(document("occurrences/attachments/download",
+                                                responseBody()));
         }
 
         @Test
