@@ -106,7 +106,7 @@ public class OccurrenceController {
             Authentication authentication) {
         Long userId = handleLoggedUserId(authentication);
 
-        byte[] fileData = occurrenceService.downloadAttachment(id, attachmentId, userId);
+        byte[] fileData = occurrenceService.downloadAttachment(id, userId, attachmentId);
 
         Attachment attachment = occurrenceService.findAttachmentById(attachmentId);
         String contentType = attachment.getMimeType();

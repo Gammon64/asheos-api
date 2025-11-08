@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -296,6 +297,61 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                                 .file(file))
                                 // O serviço lança AccessDeniedException, o Spring trata como 403
                                 .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve listar anexos de uma ocorrência")
+        void testListAttachments() throws Exception {
+                // Given
+                Attachment attachment = new Attachment(
+                                null,
+                                "test-download.jpg",
+                                "path/to/test-download.jpg",
+                                "image/jpeg",
+                                mockOccurrence);
+
+                attachmentRepository.save(attachment);
+
+                // When & Then
+                mockMvc.perform(
+                                get("/occurrences/{id}/attachments", mockOccurrence.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].fileName").value("test-download.jpg"))
+                                .andExpect(jsonPath("$[0].filePath").isString())
+                                .andDo(document("occurrences/attachments/list"));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve fazer o download de um anexo")
+        void testDownloadAttachment() throws Exception {
+                // Given
+                MockMultipartFile file = new MockMultipartFile(
+                                "file",
+                                "test-download.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                "fake-image-bytes".getBytes());
+
+                Attachment attachment = new Attachment(
+                                null,
+                                "test-download.jpg",
+                                "path/to/test-download.jpg",
+                                MediaType.IMAGE_JPEG_VALUE,
+                                mockOccurrence);
+
+                when(storageService.downloadFile(anyString()))
+                                .thenReturn(file.getBytes());
+
+                attachmentRepository.save(attachment);
+
+                // When & Then
+                mockMvc.perform(
+                                get("/occurrences/{id}/attachments/{attachmentId}/download", mockOccurrence.getId(),
+                                                attachment.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
+                                .andDo(document("occurrences/attachments/download"));
         }
 
         @Test
