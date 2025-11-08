@@ -41,7 +41,7 @@ public class Occurrence {
     @Enumerated(EnumType.STRING)
     private OccurrenceStatus status = OccurrenceStatus.OPENED; // Valor padrão
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User reportedBy;
 
