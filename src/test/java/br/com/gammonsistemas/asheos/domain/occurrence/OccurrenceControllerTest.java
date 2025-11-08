@@ -9,7 +9,9 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -122,7 +124,7 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
         }
 
         @Test
-        @DisplayName("Deve falhar ao tentar acessar rota sem usuário autenticado")
+        @DisplayName("Deve falhar ao tentar criar uma ocorrência sem usuário autenticado")
         void testCreateOccurrenceWithoutAuthentication() throws Exception {
                 // Given
                 OccurrenceRequest request = new OccurrenceRequest(
@@ -135,6 +137,122 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
                                 .content(objectMapper.writeValueAsString(request)))
                                 .andExpect(status().isUnauthorized());
         }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve listar todas as ocorrências")
+        void testListOccurrences() throws Exception {
+                // When & Then
+                mockMvc.perform(get("/occurrences"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").exists())
+                                .andExpect(jsonPath("$[0].title").value(OccurrenceMock.OCCURENCE_TITLE))
+                                .andExpect(jsonPath("$[0].status").value("OPENED"))
+                                .andDo(document("occurrences/list",
+                                                responseFields(
+                                                                fieldWithPath("[]").description(
+                                                                                "Lista de ocorrências."),
+                                                                fieldWithPath("[].id").description(
+                                                                                "ID da ocorrência."),
+                                                                fieldWithPath("[].title").description(
+                                                                                "Título da ocorrência."),
+                                                                fieldWithPath("[].description").description(
+                                                                                "Descrição detalhada."),
+                                                                fieldWithPath("[].status").description(
+                                                                                "Status da ocorrência."),
+                                                                fieldWithPath("[].reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("[].reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("[].reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("[].reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("[].attachments")
+                                                                                .description("Anexos da ocorrência."))));
+
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve encontrar uma ocorrência por Id")
+        void testFindOccurrenceById() throws Exception {
+                // When & Then
+                mockMvc.perform(get("/occurrences/{id}", mockOccurrence.getId()))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").exists())
+                                .andExpect(jsonPath("$.title").value(OccurrenceMock.OCCURENCE_TITLE))
+                                .andExpect(jsonPath("$.status").value("OPENED"))
+                                .andDo(document("occurrences/get",
+                                                responseFields(
+                                                                fieldWithPath("id").description(
+                                                                                "ID da ocorrência criada."),
+                                                                fieldWithPath("title")
+                                                                                .description("Título da ocorrência."),
+                                                                fieldWithPath("description")
+                                                                                .description("Descrição detalhada."),
+                                                                fieldWithPath("status").description(
+                                                                                "Status inicial (ex: OPENED)."),
+                                                                fieldWithPath("reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve atualizar o status de uma ocorrência")
+        void testUpdateOccurrenceStatus() throws Exception {
+                // Given
+                String newStatus = OccurrenceStatus.IN_PROGRESS.toString();
+
+                // When & Then
+                mockMvc.perform(patch("/occurrences/{id}/status", mockOccurrence.getId())
+                                .param("status", newStatus)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(mockOccurrence.getId()))
+                                .andExpect(jsonPath("$.status").value(newStatus))
+                                .andDo(document("occurrences/update-status",
+                                                responseFields(
+                                                                fieldWithPath("id").description(
+                                                                                "ID da ocorrência criada."),
+                                                                fieldWithPath("title")
+                                                                                .description("Título da ocorrência."),
+                                                                fieldWithPath("description")
+                                                                                .description("Descrição detalhada."),
+                                                                fieldWithPath("status").description(
+                                                                                "Status atualizado da ocorrência."),
+                                                                fieldWithPath("reportedBy").description(
+                                                                                "Objeto do usuário que reportou."),
+                                                                fieldWithPath("reportedBy.id")
+                                                                                .description("ID do usuário."),
+                                                                fieldWithPath("reportedBy.name")
+                                                                                .description("Nome do usuário."),
+                                                                fieldWithPath("reportedBy.email")
+                                                                                .description("Email do usuário."),
+                                                                fieldWithPath("attachments")
+                                                                                .description("Anexos da ocorrência."))));
+        }
+
+        @Test
+        @WithMockUser(username = "johndoe@test.com")
+        @DisplayName("Deve excluir uma ocorrência")
+        void testDeleteOccurrence() throws Exception {
+                // When
+                mockMvc.perform(
+                                delete("/occurrences/{id}", mockOccurrence.getId()))
+                                .andExpect(status().isNoContent()) // Espera 204
+                                .andDo(document("occurrences/delete"));
+        }
+
+        // Anexos
 
         @Test
         @WithMockUser(username = "johndoe@test.com")
