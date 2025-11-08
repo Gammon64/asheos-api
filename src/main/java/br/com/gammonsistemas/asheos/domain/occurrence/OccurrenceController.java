@@ -63,11 +63,13 @@ public class OccurrenceController {
         return ResponseEntity.ok(occurrence);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOccurrence(@PathVariable Long id) {
         occurrenceService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Rotas de Anexos
 
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Attachment> uploadAttachment(
@@ -79,11 +81,6 @@ public class OccurrenceController {
         Attachment attachment = occurrenceService.addAttachment(id, file, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(attachment);
-    }
-
-    private Long handleLoggedUserId(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return userService.findByEmail(userDetails.getUsername()).getId();
     }
 
     /**
@@ -141,6 +138,11 @@ public class OccurrenceController {
         occurrenceService.deleteAttachment(id, userId, attachmentId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    private Long handleLoggedUserId(Authentication authentication) {
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return userService.findByEmail(userDetails.getUsername()).getId();
     }
 
 }
