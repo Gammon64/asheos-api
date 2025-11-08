@@ -58,11 +58,9 @@ public class OccurrenceRepositoryTest {
     void testFindByEmailNotFound() {
         // Given
         User newUser = new User(
-                null,
                 "New User",
                 "newuser@test.com",
-                "12345678",
-                null);
+                "12345678");
         entityManager.persist(newUser);
         // When
         List<Occurrence> foundOccurrences = occurrenceRepository.findByReportedBy_id(newUser.getId());

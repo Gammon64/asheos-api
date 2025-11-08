@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.gammonsistemas.asheos.domain.address.Address;
 import br.com.gammonsistemas.asheos.domain.occurrence.Occurrence;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -55,6 +56,16 @@ public class User implements UserDetails {
     @JsonIgnore
     @OneToMany(mappedBy = "reportedBy", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Occurrence> occurrences;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Address> addresses;
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
