@@ -18,7 +18,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @RequiredArgsConstructor
-public class MinioStorageService implements StorageService {
+public class AwsStorageService implements StorageService {
 
     private final S3Client s3Client;
 
@@ -36,9 +36,7 @@ public class MinioStorageService implements StorageService {
                     .build();
 
             // 2. Prepara o corpo da requisição (os bytes do arquivo)
-            RequestBody requestBody = RequestBody.fromInputStream(
-                    file.getInputStream(), file.getSize()
-            );
+            RequestBody requestBody = RequestBody.fromBytes(file.getBytes());
 
             // 3. Envia o objeto para o Min.io (S3)
             s3Client.putObject(putRequest, requestBody);

@@ -21,13 +21,13 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class MinioStorageServiceTest {
+public class AwsStorageServiceTest {
 
     @Mock
     private S3Client s3Client;
 
     @InjectMocks
-    private MinioStorageService storageService;
+    private AwsStorageService storageService;
 
     @BeforeEach
     void setUp() {
