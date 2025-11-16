@@ -180,6 +180,15 @@ public class OccurrenceControllerTest extends AbstractRestDocsTest {
         }
 
         @Test
+        @DisplayName("Deve falhar ao tentar listar todas as ocorrências sem usuário autenticado")
+        void testListOccurrencesWithoutAuthentication() throws Exception {
+                // When & Then
+                mockMvc.perform(get("/occurrences"))
+                                .andExpect(status().isUnauthorized());
+
+        }
+
+        @Test
         @WithMockUser(username = "johndoe@test.com")
         @DisplayName("Deve encontrar uma ocorrência por Id")
         void testFindOccurrenceById() throws Exception {
