@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,7 +76,7 @@ public class OccurrenceController {
     @PostMapping(value = "/{id}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Attachment> uploadAttachment(
             @PathVariable Long id,
-            @RequestParam MultipartFile file, // O nome do campo no form-data deve ser "file"
+            @RequestPart MultipartFile file, // O nome do campo no form-data deve ser "file"
             Authentication authentication) {
         Long userId = handleLoggedUserId(authentication);
 

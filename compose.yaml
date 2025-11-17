@@ -20,10 +20,23 @@ services:
     command: server /data --console-address ":9001"
     environment:
       # O Docker Compose vai buscar o valor dessas variáveis no arquivo .env
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${AWS_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${AWS_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
+    restart: always
+  localstack:
+    image: localstack/localstack
+    container_name: asheos-localstack
+    ports:
+      - '4566:4566' # LocalStack Gateway
+      - '4510-4559:4510-4559' # external services port range
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
+    volumes:
+      - 'localstack_data:/var/lib/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
     restart: always
   app:
     build: .
@@ -35,7 +48,9 @@ services:
     depends_on:
       - postgres
       - minio
+      - localstack
     restart: always
 volumes:
   postgres_data:
   minio_data:
+  localstack_data:
