@@ -33,6 +33,7 @@ jwt:
 
 aws:
     url: ${AWS_URL}
+    region: ${AWS_REGION}
     access-key: ${AWS_ACCESS_KEY}
     secret-key: ${AWS_SECRET_KEY}
     bucket-name: ${AWS_BUCKET_NAME}
