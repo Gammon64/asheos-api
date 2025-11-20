@@ -9,11 +9,13 @@ Projeto de demonstração para portfólio, composto por uma API RESTful desenvol
 Siga os passos abaixo para configurar e executar o projeto AsheOs:
 
 1.  **Pré-requisitos:**
-    *   Java Development Kit (JDK) 17 ou superior
-    *   Maven 3.6.x ou superior
-    *   Docker Desktop (opcional, para desenvolvimento com Docker Compose)
+
+    - Java Development Kit (JDK) 17 ou superior
+    - Maven 3.6.x ou superior
+    - Docker Desktop (opcional, para desenvolvimento com Docker Compose)
 
 2.  **Clone o repositório:**
+
     ```bash
     git clone https://github.com/gammon64/asheos-api.git
     cd asheos-api
@@ -21,35 +23,55 @@ Siga os passos abaixo para configurar e executar o projeto AsheOs:
 
 3.  **Configuração do Ambiente:**
 
-    *   **Opção 1: Com Docker Compose (Recomendado para Desenvolvimento)**
-        Este é o método mais simples. Certifique-se de ter o Docker em execução e rode o comando:
-        ```bash
-        docker-compose up -d
-        ```
-        Este comando irá iniciar os contêineres do **PostgreSQL** e do **Min.io** (para armazenamento de arquivos) com as configurações padrão do projeto.
+    - **Opção 1: Com Docker Compose (Recomendado para Desenvolvimento)**
+      Este é o método mais simples, é necessário ter um arquivo `.env` configurado com as seguintes variáveis:
 
-    *   **Opção 2: Configuração Manual**
-        Se não estiver usando Docker, você precisará:
-        1.  Ter uma instância do **PostgreSQL** e um serviço de storage compatível com S3 (como o **Min.io** ou **AWS S3**) em execução.
-        2.  Criar um banco de dados (ex: `asheos_db`).
-        3.  Atualizar o arquivo `src/main/resources/application.properties` com as suas credenciais de banco de dados e storage.
+      ```
+        # JWT Configuration
+        JWT_SECRET_KEY=seu_segredo_jwt_aqui
+        JWT_EXPIRATION_MS=86400000 # 1 dia em milissegundos
 
-4.  **Segredo do JWT:**
-    Por segurança, a chave secreta para assinar os tokens JWT deve ser configurada. Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
-    ```
-    JWT_SECRET=seu_segredo_jwt_aqui
-    ```
-    >  substitua `seu_segredo_jwt_aqui` por uma chave secreta forte e única.
+        # PostgreSQL Configuration
+        DB_NAME=nome_do_banco
+        DB_URL=url_do_banco_de_dados # ex: jdbc:postgresql://postgres:5432/${DB_NAME}
+        DB_USERNAME=usuario_do_banco
+        DB_PASSWORD=senha_do_banco
+        DB_DRIVER=driver_do_banco # ex: org.postgresql.Driver
 
-5.  **Construa o projeto:**
-    ```bash
-    ./mvnw clean install
-    ```
+        # S3 Configuration
+        AWS_URL=url_do_servico_s3 # ex: http://localhost:9000
+        AWS_REGION=sua_regiao # ex: sa-east-1
+        AWS_ACCESS_KEY=seu_usuario_ou_access_key
+        AWS_SECRET_KEY=sua_senha_ou_secret_key
+        AWS_BUCKET_NAME=nome_do_bucket
+      ```
 
-5.  **Execute a aplicação:**
-    ```bash
-    ./mvnw spring-boot:run
-        
+      Certifique-se de ter o Docker em execução e rode o comando:
+
+      ```bash
+      docker-compose up -d
+      ```
+
+      Este comando irá iniciar os contêineres do **PostgreSQL**, **Min.io** e **LocalStack** (para armazenamento de arquivos) com as configurações padrão do projeto.
+
+    - **Opção 2: Configuração Manual**
+      Se não estiver usando Docker, você precisará:
+
+      1.  Ter uma instância do **PostgreSQL** e um serviço de storage compatível com S3 (como o **Min.io** ou **AWS S3**) em execução.
+      2.  Criar um banco de dados (ex: `asheos_db`).
+      3.  Atualizar o arquivo `src/main/resources/application.properties` com as suas credenciais de banco de dados e storage.
+      4.  **Construa o projeto:**
+
+          ```bash
+          ./mvnw clean install
+          ```
+
+      5:. **Execute a aplicação:**
+
+          ```bash
+          ./mvnw spring-boot:run
+
+          ```
 
 ## 📖 Acessando a API e a Documentação
 
@@ -58,6 +80,7 @@ Após iniciar a aplicação, você pode interagir com ela e visualizar a documen
 ### Documentação da API (Spring REST Docs)
 
 A documentação completa dos endpoints, incluindo exemplos de requisições e respostas, é gerada automaticamente durante a fase de testes do Maven (`./mvnw clean install`).
+
 1.  **Gere a documentação** (se ainda não o fez):
     ```bash
     ./mvnw clean install
@@ -69,49 +92,61 @@ A documentação completa dos endpoints, incluindo exemplos de requisições e r
 
 Você pode usar ferramentas como `curl`, Postman ou Insomnia para fazer requisições à API.
 
-*   **URL Base:** `http://localhost:8084`
-*   **Endpoints Principais:**
-    *   `POST /auth/register`: Para registrar um novo usuário.
-    *   `POST /auth/login`: Para autenticar e obter um token JWT.
-    *   `GET /users/me`: Retorna os dados do usuário autenticado (requer autenticação).
-    *   `POST /occurrences`: Cria uma nova ocorrência (requer autenticação).
+- **URL Base:** `http://localhost:8084`
+- **Endpoints Principais:**
+  - `POST /auth/register`: Para registrar um novo usuário.
+  - `POST /auth/login`: Para autenticar e obter um token JWT.
+  - `GET /users/me`: Retorna os dados do usuário autenticado (requer autenticação).
+  - `POST /occurrences`: Cria uma nova ocorrência (requer autenticação).
 
 > **Nota:** Para acessar endpoints protegidos, inclua o token JWT no cabeçalho `Authorization` da sua requisição: `Authorization: Bearer <seu_token_aqui>`.
 
 ## 🛠️ Principais Dependências
 
 ### Spring Boot Data JPA
+
 Gerenciamento de dados relacionais com Persistence API e Hibernate.
 
 ### Spring Boot Security
+
 Implementação de autenticação e autorização JWT para proteger endpoints.
 
 ### Spring Boot Web
+
 Camada Web de API RESTful para comunicação cliente-servidor.
 
 ### Spring Boot Rest Docs
+
 Geração automática de documentação para APIs RESTful.
 
 ### Spring Boot DevTools
+
 Ferramenta para reinicialização automática e LiveReload.
 
 ### Spring Boot Docker Compose
+
 Facilita a configuração e execução de contêineres Docker.
 
 ### Flyway
+
 Gerenciamento de migrações de banco de dados.
 
 ### H2 Database
+
 Banco de dados em memória para desenvolvimento de testes rápidos.
 
 ### PostgreSQL Driver
+
 Driver JDBC para conexão com banco de dados PostgreSQL.
 
 ### Lombok
+
 Redução de código boilerplate com anotações para getters, setters, construtores, etc.
 
 ### Spring Boot Validation
+
 Validação de dados de entrada usando anotações.
 
 ### Auth0 JWT
+
 Biblioteca para criação e verificação de tokens JWT para autenticação segura.
