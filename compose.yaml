@@ -1,13 +1,13 @@
 services:
   postgres:
-    image: 'postgres:16'
+    image: "postgres:16"
     container_name: asheos-db
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - '5434:5432'
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
@@ -20,8 +20,8 @@ services:
     command: server /data --console-address ":9001"
     environment:
       # O Docker Compose vai buscar o valor dessas variáveis no arquivo .env
-      MINIO_ROOT_USER: ${AWS_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${AWS_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${AWS_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${AWS_SECRET_KEY}
     volumes:
       - minio_data:/data
     restart: always
@@ -29,20 +29,20 @@ services:
     image: localstack/localstack
     container_name: asheos-localstack
     ports:
-      - '4566:4566' # LocalStack Gateway
-      - '4510-4559:4510-4559' # external services port range
+      - "4566:4566" # LocalStack Gateway
+      - "4510-4559:4510-4559" # external services port range
     environment:
       - AWS_REGION=${AWS_REGION}
       - AWS_BUCKET_NAME=${AWS_BUCKET_NAME}
     volumes:
-      - 'localstack_data:/var/lib/localstack'
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - "localstack_data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     restart: always
   app:
     build: .
     container_name: asheos-api
     ports:
-      - '8084:8084'
+      - "8084:8084"
     env_file:
       - .env
     depends_on:
