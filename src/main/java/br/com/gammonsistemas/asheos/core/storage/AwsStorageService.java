@@ -38,7 +38,7 @@ public class AwsStorageService implements StorageService {
             // 2. Prepara o corpo da requisição (os bytes do arquivo)
             RequestBody requestBody = RequestBody.fromBytes(file.getBytes());
 
-            // 3. Envia o objeto para o Min.io (S3)
+            // 3. Envia o objeto para o Storage (S3)
             s3Client.putObject(putRequest, requestBody);
 
             // 4. Retorna a chave do objeto (o caminho) para salvar no banco
@@ -46,7 +46,7 @@ public class AwsStorageService implements StorageService {
 
         } catch (IOException | S3Exception e) {
             // (Em produção, trate exceções de forma mais granular)
-            throw new RuntimeException("Falha ao fazer upload do arquivo para o Min.io: " + e.getMessage(), e);
+            throw new RuntimeException("Falha ao fazer upload do arquivo para o Storage: " + e.getMessage(), e);
         }
     }
 

@@ -37,7 +37,7 @@ public class AwsStorageServiceTest {
     }
 
     @Test
-    @DisplayName("Deve fazer o upload de um arquivo para o Min.io")
+    @DisplayName("Deve fazer o upload de um arquivo para o Storage")
     void testUploadFile() throws IOException {
         // Given
         MockMultipartFile file = new MockMultipartFile(
@@ -60,7 +60,7 @@ public class AwsStorageServiceTest {
     }
 
     @Test
-    @DisplayName("Deve excluir um arquivo do Min.io")
+    @DisplayName("Deve excluir um arquivo do Storage")
     void testDeleteFile() {
         // Given
         String objectKey = "path/to/test.jpg";
