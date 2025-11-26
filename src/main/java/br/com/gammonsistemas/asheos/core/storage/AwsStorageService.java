@@ -7,14 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.http.HttpStatusCode;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.utils.Validate;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,12 @@ public class AwsStorageService implements StorageService {
     @Override
     public String uploadFile(MultipartFile file, String objectKey) {
         try {
+            // Se o bucket não existir, cria o bucket
+            
+            if (!doesBucketExist(bucketName, s3Client)) {
+                s3Client.createBucket(builder -> builder.bucket(bucketName));
+            }
+
             // 1. Cria a requisição de upload
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucketName)
@@ -75,6 +84,24 @@ public class AwsStorageService implements StorageService {
             s3Client.deleteObject(deleteRequest);
         } catch (S3Exception e) {
             throw new RuntimeException("Falha ao deletar o arquivo: " + objectKey, e);
+        }
+    }
+
+    public boolean doesBucketExist(String bucketName, S3Client s3SyncClient) {
+        try {
+            Validate.notEmpty(bucketName, "The bucket name must not be null or an empty string.", "");
+            s3SyncClient.getBucketAcl(r -> r.bucket(bucketName));
+            return true;
+        } catch (AwsServiceException ase) {
+            // A redirect error or an AccessDenied exception means the bucket exists but it's not in this region
+            // or we don't have permissions to it.
+            if ((ase.statusCode() == HttpStatusCode.MOVED_PERMANENTLY) || "AccessDenied".equals(ase.awsErrorDetails().errorCode())) {
+                return true;
+            }
+            if (ase.statusCode() == HttpStatusCode.NOT_FOUND) {
+                return false;
+            }
+            throw ase;
         }
     }
 
